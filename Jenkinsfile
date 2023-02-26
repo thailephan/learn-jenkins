@@ -1,6 +1,10 @@
-/* Requires the Docker Pipeline plugin */
-node {
-	stage('Hello') {
-		echo 'Hello world'
-	}
+#!/usr/bin/env groovy
+pipeline {
+    stages {
+        stage('hello') {
+            steps {
+                echo 'Hello world'
+            }
+        }
+    }
 }
