@@ -5,19 +5,9 @@ pipeline {
     }
   }
   stages {
-    stage('verify tooling') {
-      steps {
-        sh '''
-          docker compose version
-          docker version
-        '''
-      }
-    }
-    
-    stage('build') {
-      steps {
-        sh 'echo "build"'
-      }
+    stage("script") {
+      sh 'whoami'
+      sh 'which docker'
     }
   }
 }
