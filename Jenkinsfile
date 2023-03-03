@@ -6,8 +6,10 @@ pipeline {
   }
   stages {
     stage("script") {
-      sh 'whoami'
-      sh 'which docker'
+      steps {
+        sh 'whoami'
+        sh 'which docker'
+      }
     }
   }
 }
