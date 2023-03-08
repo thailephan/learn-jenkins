@@ -9,15 +9,6 @@ pipeline {
       }
     }
     
-    stage('verify tooling') {
-      steps {
-        sh '''
-          docker compose version
-          docker version
-        '''
-      }
-    }
-    
     stage('build') {
       parallel {
         stage('build 1') {
