@@ -1,0 +1,186 @@
+// Running Agent
+
+// Setting global tools for jenkins -> when agent run pipeline -> check that tools (nodejs, gradle, maven, docker,...) that configured to use has installed or not
+// -> Automatically install if not found and after finished pipeline that agent won't need to reinstall for later pipelines
+
+pipeline {
+    agent any
+
+//     Không chỉ định agent nào cả -> các stage phải chỉ định cụ thể để chạy được
+    agent none
+
+    agent {
+
+        docker {
+            image 'node:16-alpine'
+//             Kiếm node match label
+            label 'agent node label'
+            registryUrl 'https://myregistry.com/'
+            registryCredentialsId 'myPredefinedCredentialsInJenkins'
+        }
+
+        node {
+            label 'required label to choose running agent'
+        } <=> label 'required label to choose running agent'
+
+//  Chỉ định node sẽ chạy cái pipeline này mà cái node đó có nhãn là label-name (được đặt khi tạo agent đến controller)
+        label 'label-name'
+//      Negative of above
+        label '!label-name'
+    }
+
+//  used to set environment-specific settings, such as database connection strings, API keys, or other configuration values.
+    environment {
+        NEW_ENVIRONMENT = '1.3.0'
+        DB_URL = "mongodb;//localhost:27017/db-test"
+    }
+
+    parameters {
+        string(name: 'BRANCH', defaultValue: 'master', description: 'Branch to build')
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'qa', 'prod'], description: 'Deployment environment')
+        booleanParam(name: 'SHOULD_DEPLOY', defaultValue: false, description: 'Should deploy this to production')
+    }
+
+    options {
+//     Retry 2 times when has failure in pipeline
+        retry(2)
+
+//      If execution time of pipeline is more than 2 seconds then -> it is aborted, and will be stopped
+        timeout( time: 2, unit: "SECONDS")
+    }
+
+//     Use to trigger some thing base on function
+    triggers {
+//      Cron job will run or will do something each minutes as defined below
+        cron('* * * * *')
+    }
+
+    stages {
+//         stage('verify tooling') {
+//             steps {
+//                 sh '''
+//                 docker version
+//                 docker info
+//                 docker compose version
+//
+//                 curl --version
+//                 '''
+//             }
+//         }
+
+//         stage('Prune Docker data') {
+//             steps {
+//
+//                 -a : all unused images
+//                 -f : just remove without confirmation
+//                 --volumes : remove all volumes
+//                 ssh 'docker system prune -a --volumes -f'
+//             }
+//         }
+
+//         stage('start container') {
+//             steps {
+//                 sh 'docker compose up -d --no-color --wait'
+//                 sh 'docker compose ps'
+//             }
+//         }
+
+//         stage('test container') {
+//             steps {
+// //              Do something to test your tools
+//             }
+//         }
+
+        stage('build') {
+            when {
+                expression {
+                    false
+                }
+            }
+            steps {
+                echo "Building application"
+                echo "Building application ${NEW_ENVIRONMENT}"
+                echo 'Building application ${NEW_ENVIRONMENT}'
+            }
+        }
+
+        stage('test') {
+            when {
+//             Hông biết luôn ??
+            triggeredBy 'TimeTrigger'
+//             Hông biết ??
+            beforeAgent true
+//             Execute when git branch is 'dev'
+                branch 'dev'
+//              environment variable can be defined in global jenkins file, in jenkins, in running agent node
+                environment name: 'DEPLOY_TO', value: 'production'
+            }
+            steps {
+                echo "Testing application"
+            }
+        }
+
+        stage('Deploy 1') {
+            steps {
+//              Retry call flakey-deploy.sh file 3 times when something failed
+                retry(3) {
+                    sh './flakey-deploy.sh'
+                }
+
+//              The same for global timeout but this is for one or multiple steps wrapped in timeout
+                timeout(time: 3, unit: 'MINUTES') {
+                    sh './health-check.sh'
+                }
+            }
+        }
+
+//      Retry our deployment 5 times, but never want to spend more than 3 minutes in total before failing the stage
+        stage('Deploy 2') {
+            steps {
+                timeout(time: 3, unit: 'MINUTES') {
+                    retry(5) {
+                        sh './flakey-deploy.sh'
+                    }
+                }
+            }
+        }
+        stage('Sanity check') {
+            steps {
+                input "Does the staging environment look ok?"
+            }
+        }
+    }
+
+    post {
+        failure {
+            echo 'This will run only if failed'
+        }
+
+        success {
+            echo 'This will run only if successful'
+        }
+
+        always {
+            echo 'This will always run'
+//          Remove unused container after change services container in docker
+            sh 'docker compose down --remove-orphans -v'
+            sh 'docker compose ps'
+
+            mail to: 'team@example.com',
+                         subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
+                         body: "Something is wrong with ${env.BUILD_URL}"
+            slackSend channel: '#ops-room',
+                              color: 'good',
+                              message: "The pipeline ${currentBuild.fullDisplayName} completed successfully."
+        }
+
+        unstable {
+            echo 'This will run only if the run was marked as unstable'
+        }
+
+        changed {
+            echo 'This will run only if the state of the Pipeline has changed'
+            echo 'For example, if the Pipeline was previously failing but is now successful'
+        }
+    }
+}
