@@ -9,7 +9,7 @@ pipeline {
       }
     }
     
-stage('verify tooling') {
+    stage('verify tooling') {
       steps {
         sh '''
           docker compose version
@@ -19,8 +19,18 @@ stage('verify tooling') {
     }
     
     stage('build') {
-      steps {
-        sh 'docker build -t meme:latest .'
+      parallel {
+        stage('build 1') {
+          steps {
+            sh 'echo Build 1'
+          }
+        }
+
+        stage('build 2') {
+          steps {
+            sh 'echo "Build 2"'
+          }
+        }
       }
     }
   }
