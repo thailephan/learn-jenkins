@@ -20,7 +20,7 @@ stage('verify tooling') {
     
     stage('build') {
       steps {
-        sh 'echo "build"'
+        sh 'docker build -t meme:latest .'
       }
     }
   }
