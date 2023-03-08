@@ -1,3 +1,3 @@
-FROM alpine:latest
+FROM scratch
 
 ENTRYPOINT ["echo", "Hello world!"]
