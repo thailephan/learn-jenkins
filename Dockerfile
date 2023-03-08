@@ -1,3 +1,3 @@
 FROM alpine:latest
 
-ENTRYPOINT ["echo", '"Hello world!"']
+ENTRYPOINT ["echo", "Hello world!"]
