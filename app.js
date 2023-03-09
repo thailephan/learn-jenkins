@@ -9,6 +9,16 @@ app.get("/meme", (req, res) => {
     res.json("Back meme");
 })
 
+app.get("/features", (req, res) => {
+    res.json({
+        success: true,
+        data: {
+            id: 1,
+            name: "Add shop voucher",
+        }
+    });
+})
+
 app.listen(3001, () => {
     console.log("Server is running");
 })
