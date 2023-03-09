@@ -5,6 +5,10 @@ app.get("/hello", (req, res) => {
     res.json("Update message");
 })
 
+app.get("/meme", (req, res) => {
+    res.json("Back meme");
+})
+
 app.listen(3001, () => {
     console.log("Server is running");
 })
