@@ -13,7 +13,7 @@ pipeline {
     stage('deploy image to docker hub') {
         steps {
             // This step should not normally be used in your script. Consult the inline help for details.
-            withDockerRegistry(credentialsId: 'dockerhub-thailephanminh') {
+            withDockerRegistry(credentialsId: 'dockerhub-thailephanminh', url: 'https://index.docker.io/v1/') {
                 sh 'docker push thailephan/jenkins-node:latest'
             }
         }
