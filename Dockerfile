@@ -1,3 +1,11 @@
-FROM alpine:latest
+FROM node:16.19.1-alpine3.17
 
-ENTRYPOINT ["echo", "Hello world!"]
+WORKDIR /app
+
+COPY package*.json yarn*.lock ./
+
+RUN npm install
+
+COPY . .
+
+ENTRYPOINT ["node", "app.js"]
