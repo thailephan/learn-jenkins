@@ -6,7 +6,7 @@ pipeline {
   // Push image to registry
     stage('build') {
         steps {
-            sh 'docker build -t thailephan/jenkins-node:latest .'
+            sh 'docker build -t thailephanminh/jenkins-node:latest .'
         }
     }
 
@@ -14,7 +14,7 @@ pipeline {
         steps {
             // This step should not normally be used in your script. Consult the inline help for details.
             withDockerRegistry(credentialsId: 'dockerhub-thailephanminh', url: 'https://index.docker.io/v1/') {
-                sh 'docker push thailephan/jenkins-node:latest'
+                sh 'docker push thailephanminh/jenkins-node:latest'
             }
         }
     }
