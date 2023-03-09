@@ -1,0 +1,11 @@
+{
+  "name": "learn-jenkins",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/thailephan/learn-jenkins.git",
+  "author": "Thai Le Phan Minh <thailephanminh@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
