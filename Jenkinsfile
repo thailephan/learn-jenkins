@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-       def gitCommit = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+       gitCommit = "${GIT_COMMIT[0..7]}"
   }
 
   stages {
@@ -18,7 +18,8 @@ pipeline {
         steps {
             // This step should not normally be used in your script. Consult the inline help for details.
             withDockerRegistry(credentialsId: 'dockerhub-thailephanminh', url: 'https://index.docker.io/v1/') {
-                sh "docker push thailephanminh/jenkins-node:latest thailephanminh/jenkins-node:${gitCommit}"
+                sh "docker push thailephanminh/jenkins-node:latest"
+                sh "docker push thailephanminh/jenkins-node:${gitCommit}"
             }
         }
     }
